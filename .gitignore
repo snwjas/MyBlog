@@ -2,6 +2,11 @@
 target/
 *.iml
 src/main/resources/admin/*
+!src/main/resources/admin/.gitkeep
 src/main/resources/app/*
-src/main/resources/BugRecords.md
+!src/main/resources/app/.gitkeep
+src/main/resources/static/*
+!src/main/resources/static/.gitkeep
 src/test/java/xyz/snwjas/blog/*
+!src/test/java/xyz/snwjas/blog/.gitkeep
+src/main/resources/BugRecords.md
