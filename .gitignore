@@ -1,0 +1,7 @@
+.idea/
+target/
+*.iml
+src/main/resources/admin/*
+src/main/resources/app/*
+src/main/resources/BugRecords.md
+src/test/java/xyz/snwjas/blog/*

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="xyz.snwjas.blog.mapper.BlogMapper">
+	<!--
+		${ } 的变量的替换阶段是在动态 SQL 解析阶段，而 #{ } 的变量的替换是在 DBMS 中
+	    ${ } 一般用于传输数据库的表名、字段名等
+	    能用 #{ } 的地方尽量别用 ${ }，防止SQL注入
+	 -->
+	<select id="sum" resultType="integer">
+		select ifnull(sum(${column}), 0)
+		from blog ${ew.customSqlSegment};
+	</select>
+</mapper>
