@@ -59,8 +59,8 @@ public class SwaggerConfig {
 				.title("MyBlog API Documentation.")
 				.description("The API documentation for MyBlog.")
 				.version("1.0.0")
-				.contact(new Contact("Myles", "blog.snwjas.xyz", "snwjas@163.com"))
-				.license("")
+				.contact(new Contact("Myles Yang", "snwjas.xyz", "myles.yang@foxmail.com"))
+				.license("MIT")
 				.licenseUrl("")
 				.build();
 	}
