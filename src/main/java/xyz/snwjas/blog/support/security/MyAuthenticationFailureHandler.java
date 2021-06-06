@@ -5,7 +5,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import xyz.snwjas.blog.annotation.ActionRecord;
-import xyz.snwjas.blog.constant.ResponseStatus;
+import xyz.snwjas.blog.constant.RS;
 import xyz.snwjas.blog.model.R;
 import xyz.snwjas.blog.model.enums.LogType;
 import xyz.snwjas.blog.utils.RUtils;
@@ -28,9 +28,9 @@ public class MyAuthenticationFailureHandler implements AuthenticationFailureHand
 			, AuthenticationException exception) throws IOException, ServletException {
 		R result;
 		if (exception instanceof BadCredentialsException) {
-			result = RUtils.fail(ResponseStatus.USERNAME_PASSWORD_ERROR);
+			result = RUtils.fail(RS.USERNAME_PASSWORD_ERROR);
 		} else {
-			result = RUtils.fail(ResponseStatus.SYSTEM_ERROR);
+			result = RUtils.fail(RS.SYSTEM_ERROR);
 		}
 		RWriterUtils.writeJson(response, result);
 	}

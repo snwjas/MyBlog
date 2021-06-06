@@ -5,7 +5,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import xyz.snwjas.blog.annotation.AccessLimit;
 import xyz.snwjas.blog.constant.CacheKeyPrefix;
-import xyz.snwjas.blog.constant.ResponseStatus;
+import xyz.snwjas.blog.constant.RS;
 import xyz.snwjas.blog.exception.ServiceException;
 import xyz.snwjas.blog.support.cache.MemoryCacheStore;
 import xyz.snwjas.blog.utils.IPUtils;
@@ -60,7 +60,7 @@ public class AccessLimitInterceptor implements HandlerInterceptor {
 			if (count < maxCount) {
 				memoryCacheStore.set(key, count + 1, seconds);
 			} else {
-				throw new ServiceException(ResponseStatus.FREQUENT_OPERATION);
+				throw new ServiceException(RS.FREQUENT_OPERATION);
 			}
 		} else {
 			memoryCacheStore.set(key, 1, seconds);

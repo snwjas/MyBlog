@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import xyz.snwjas.blog.annotation.AccessLimit;
 import xyz.snwjas.blog.annotation.TimeCost;
 import xyz.snwjas.blog.constant.CacheKeyPrefix;
-import xyz.snwjas.blog.constant.ResponseStatus;
+import xyz.snwjas.blog.constant.RS;
 import xyz.snwjas.blog.model.entity.BlogEntity;
 import xyz.snwjas.blog.model.enums.BlogStatus;
 import xyz.snwjas.blog.model.params.BlogSearchParam;
@@ -103,7 +103,7 @@ public class BlogController {
 	public R like(@PathVariable("blogId") @Min(1) Integer blogId) {
 		int like = blogService.like(blogId);
 		if (like == 0) {
-			return RUtils.fail(ResponseStatus.ILLEGAL_PARAMETER);
+			return RUtils.fail(RS.ILLEGAL_PARAMETER);
 		}
 		if (like == -1) {
 			return RUtils.success("取消点赞", like);

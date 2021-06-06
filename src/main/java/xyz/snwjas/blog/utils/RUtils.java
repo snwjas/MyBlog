@@ -1,7 +1,7 @@
 package xyz.snwjas.blog.utils;
 
 import org.springframework.http.HttpStatus;
-import xyz.snwjas.blog.constant.ResponseStatus;
+import xyz.snwjas.blog.constant.RS;
 import xyz.snwjas.blog.model.R;
 
 /**
@@ -40,7 +40,7 @@ public class RUtils {
 
 
 	public static R success(String message, Object data) {
-		return result(ResponseStatus.SUCCESS.status(), message, data);
+		return result(RS.SUCCESS.status(), message, data);
 	}
 
 	public static R success(String message) {
@@ -48,7 +48,7 @@ public class RUtils {
 	}
 
 	public static R succeed() {
-		return success(ResponseStatus.SUCCESS.message());
+		return success(RS.SUCCESS.message());
 	}
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ public class RUtils {
 	 * 失败，不传 status ，默认系统错误
 	 */
 	public static R fail(String message, Object data) {
-		return result(ResponseStatus.SYSTEM_ERROR.status(), message, data);
+		return result(RS.SYSTEM_ERROR.status(), message, data);
 	}
 
 	public static R fail(String message) {
@@ -65,11 +65,11 @@ public class RUtils {
 	}
 
 
-	public static R fail(ResponseStatus status, Object data) {
+	public static R fail(RS status, Object data) {
 		return result(status.status(), status.message(), data);
 	}
 
-	public static R fail(ResponseStatus status) {
+	public static R fail(RS status) {
 		return result(status.status(), status.message(), EMPTY_DATA);
 	}
 

@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import xyz.snwjas.blog.config.properties.MyBlogProperties;
 import xyz.snwjas.blog.constant.CacheKeyPrefix;
-import xyz.snwjas.blog.constant.ResponseStatus;
+import xyz.snwjas.blog.constant.RS;
 import xyz.snwjas.blog.exception.ServiceException;
 import xyz.snwjas.blog.model.UserDetail;
 import xyz.snwjas.blog.service.impl.UserServiceImpl;
@@ -52,7 +52,7 @@ public class MyUserDetailsService implements UserDetailsService {
 				memoryCacheStore.set(key, count + 1, properties.getAllowLoginFailureSeconds());
 			} else {
 				log.info("Ip: [{}] 多次登录失败", ipAddress);
-				throw new ServiceException(ResponseStatus.MULTIPLE_AUTHENTICATION_FAILURE);
+				throw new ServiceException(RS.MULTIPLE_AUTHENTICATION_FAILURE);
 			}
 		} else {
 			memoryCacheStore.set(key, 1, properties.getAllowLoginFailureSeconds());

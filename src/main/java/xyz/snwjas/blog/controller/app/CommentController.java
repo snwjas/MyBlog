@@ -8,7 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.snwjas.blog.annotation.AccessLimit;
 import xyz.snwjas.blog.annotation.TimeCost;
-import xyz.snwjas.blog.constant.ResponseStatus;
+import xyz.snwjas.blog.constant.RS;
 import xyz.snwjas.blog.model.PageResult;
 import xyz.snwjas.blog.model.R;
 import xyz.snwjas.blog.model.entity.CommentEntity;
@@ -52,7 +52,7 @@ public class CommentController {
 		int cur = Integer.parseInt(current);
 
 		if (bid < 1 || pid < 0 || cur < 1) {
-			return RUtils.fail(ResponseStatus.ILLEGAL_PARAMETER);
+			return RUtils.fail(RS.ILLEGAL_PARAMETER);
 		}
 
 		BasePageParam param = new BasePageParam()

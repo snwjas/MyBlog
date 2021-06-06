@@ -1,7 +1,7 @@
 package xyz.snwjas.blog.exception;
 
 import org.springframework.http.HttpStatus;
-import xyz.snwjas.blog.constant.ResponseStatus;
+import xyz.snwjas.blog.constant.RS;
 
 /**
  * 服务异常
@@ -15,21 +15,21 @@ public class ServiceException extends MyBlogException {
 	private final int status;
 
 	public ServiceException() {
-		super(ResponseStatus.SYSTEM_ERROR.message());
-		this.status = ResponseStatus.SYSTEM_ERROR.status();
+		super(RS.SYSTEM_ERROR.message());
+		this.status = RS.SYSTEM_ERROR.status();
 	}
 
 	public ServiceException(String message) {
 		super(message);
-		this.status = ResponseStatus.SYSTEM_ERROR.status();
+		this.status = RS.SYSTEM_ERROR.status();
 	}
 
 	public ServiceException(String message, Throwable cause) {
 		super(message, cause);
-		this.status = ResponseStatus.SYSTEM_ERROR.status();
+		this.status = RS.SYSTEM_ERROR.status();
 	}
 
-	public ServiceException(ResponseStatus status) {
+	public ServiceException(RS status) {
 		super(status.message());
 		this.status = status.status();
 	}

@@ -27,6 +27,7 @@ import xyz.snwjas.blog.utils.LambdaTypeUtils;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -105,6 +106,8 @@ public class AttachmentServiceImpl implements AttachmentService {
 
 	@Override
 	public int updateNameById(int attachmentId, String attachmentName) {
+		// 文件中不能出现 ‘/’ , 会影响后续字符串切割
+		attachmentName = org.apache.commons.lang3.StringUtils.remove(attachmentName, "/");
 		return attachmentMapper.update(null,
 				Wrappers.lambdaUpdate(AttachmentEntity.class)
 						.eq(AttachmentEntity::getId, attachmentId)
@@ -224,6 +227,13 @@ public class AttachmentServiceImpl implements AttachmentService {
 		}
 
 		String uuid = "-" + org.apache.commons.lang3.StringUtils.remove(UUID.randomUUID().toString(), '-');
+
+		// 如果 fileName 字节数大于255-uuid.length()，截取
+		byte[] fileNameBytes = fileName.getBytes(StandardCharsets.UTF_8);
+		int fileNameLength = 255 - uuid.length();
+		if (fileNameBytes.length > fileNameLength) {
+			fileName = new String(Arrays.copyOf(fileNameBytes, fileNameLength));
+		}
 
 		// 获取文件名
 		String newFileName = FileUtils.fileNameAppend(fileName, uuid);

@@ -9,7 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import xyz.snwjas.blog.constant.ResponseStatus;
+import xyz.snwjas.blog.constant.RS;
 import xyz.snwjas.blog.model.params.UpdatePasswordParam;
 import xyz.snwjas.blog.model.vo.UserVO;
 import xyz.snwjas.blog.service.UserService;
@@ -45,7 +45,7 @@ public class UserController {
 	public R login() {
 		Authentication auth = userService.getAuth();
 		if (Objects.isNull(auth)) {
-			return RUtils.fail(ResponseStatus.NOT_LOGIN);
+			return RUtils.fail(RS.NOT_LOGIN);
 		}
 		return RUtils.success("用户 [" + auth.getName() + "] 已登录");
 	}
@@ -92,12 +92,12 @@ public class UserController {
 		String newPassword = param.getNewPassword();
 		String confirmNewPassword = param.getConfirmNewPassword();
 		if (!newPassword.equals(confirmNewPassword)) {
-			return RUtils.fail(ResponseStatus.INCONSISTENT_PASSWORDS);
+			return RUtils.fail(RS.INCONSISTENT_PASSWORDS);
 		}
 
 		UserDetail userDetail = getUserDetail();
 		if (!passwordEncoder.matches(param.getOldPassword(), userDetail.getPassword())) {
-			return RUtils.fail(ResponseStatus.PASSWORD_ERROR);
+			return RUtils.fail(RS.PASSWORD_ERROR);
 		}
 
 		String encodedPassword = passwordEncoder.encode(newPassword);

@@ -3,7 +3,7 @@ package xyz.snwjas.blog.constant;
 import org.springframework.http.HttpStatus;
 
 /**
- * 自定义状态码
+ * 自定义状态码（Response Status）
  * <p>
  * 200 成功
  * 1001 - 1999 参数
@@ -16,7 +16,7 @@ import org.springframework.http.HttpStatus;
  *
  * @author Myles Yang
  */
-public enum ResponseStatus {
+public enum RS {
 
 	SUCCESS(HttpStatus.OK.value(), "成功"),
 
@@ -64,7 +64,7 @@ public enum ResponseStatus {
 
 	private final String message;
 
-	ResponseStatus(int status, String message) {
+	RS(int status, String message) {
 		this.status = status;
 		this.message = message;
 	}
@@ -77,8 +77,8 @@ public enum ResponseStatus {
 		return message;
 	}
 
-	public static ResponseStatus resolve(int statusCode) {
-		for (ResponseStatus rc : values()) {
+	public static RS resolve(int statusCode) {
+		for (RS rc : values()) {
 			if (rc.status == statusCode) {
 				return rc;
 			}
