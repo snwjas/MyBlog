@@ -188,7 +188,8 @@ public class BlogServiceImpl implements BlogService {
 				: blogEntity.getTitle();
 		if (isExist(url)) {
 			// 数据库长度 255
-			url = (System.currentTimeMillis() + url).substring(0, 255);
+			String newUrl = System.currentTimeMillis() + url;
+			url = newUrl.substring(0, Math.min(newUrl.length(), 255));
 		}
 		blogEntity.setUrl(url);
 		// 设置分类
