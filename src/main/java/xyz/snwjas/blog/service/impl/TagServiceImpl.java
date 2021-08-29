@@ -237,12 +237,9 @@ public class TagServiceImpl implements TagService {
 	}
 
 	@Override
-	public List<TagVO> covertToTagVOList(List<TagEntity> tagEntityList) {
-		List<TagVO> tagVOList = new ArrayList<>();
-		for (TagEntity tagEntity : tagEntityList) {
-			TagVO tagVO = covertToTagVO(tagEntity);
-			tagVOList.add(tagVO);
-		}
-		return tagVOList;
+	public List<TagVO> covertToTagVOList(@NonNull List<TagEntity> tagEntityList) {
+		return tagEntityList.stream().parallel()
+				.map(this::covertToTagVO)
+				.collect(Collectors.toList());
 	}
 }

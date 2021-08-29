@@ -10,12 +10,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.snwjas.blog.constant.RS;
+import xyz.snwjas.blog.model.R;
+import xyz.snwjas.blog.model.UserDetail;
 import xyz.snwjas.blog.model.params.UpdatePasswordParam;
 import xyz.snwjas.blog.model.vo.UserVO;
 import xyz.snwjas.blog.service.UserService;
-import xyz.snwjas.blog.model.R;
-import xyz.snwjas.blog.model.UserDetail;
-import xyz.snwjas.blog.support.cache.MemoryCacheStore;
 import xyz.snwjas.blog.utils.RUtils;
 
 import java.util.HashMap;
@@ -36,9 +35,6 @@ public class UserController {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
-
-	@Autowired
-	private MemoryCacheStore cache;
 
 	@ApiOperation("检查用户登录状态")
 	@GetMapping("/login")

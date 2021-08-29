@@ -4,18 +4,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import xyz.snwjas.blog.config.properties.MyBlogProperties;
+import xyz.snwjas.blog.constant.RS;
 import xyz.snwjas.blog.interceptor.AccessLimitInterceptor;
 import xyz.snwjas.blog.interceptor.StatisticInterceptor;
+import xyz.snwjas.blog.utils.RUtils;
+import xyz.snwjas.blog.utils.RWriterUtils;
 
 import java.io.File;
 import java.util.List;
@@ -53,6 +58,7 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 	 * 跨域访问配置
 	 */
 	@Bean
+	@Profile({"dev", "test"})
 	public CorsFilter corsFilter() {
 		CorsConfiguration config = new CorsConfiguration();
 		config.addAllowedOrigin("*");
@@ -125,4 +131,14 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 		super.configureMessageConverters(converters);
 	}
 
+	/**
+	 * error page 返回json
+	 */
+	@Bean("error")
+	public View error() {
+		// return new MappingJackson2JsonView();
+		return (model, request, response) -> {
+			RWriterUtils.writeJson(response, RUtils.fail(RS.PAGE_NOT_FOUND, model.get("path")));
+		};
+	}
 }

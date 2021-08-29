@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
  *
  * @author Myles Yang
  */
-public enum MyBlogOptionEnum {
+public enum MyBlogOptionEnum implements OptionEnum {
 
 	/**
 	 * 博客主页url
@@ -59,14 +59,17 @@ public enum MyBlogOptionEnum {
 		this.defaultValue = defaultValue;
 	}
 
+	@Override
 	public String key() {
 		return key;
 	}
 
+	@Override
 	public Class<?> type() {
 		return type;
 	}
 
+	@Override
 	public String defaultValue() {
 		return defaultValue;
 	}

@@ -4,19 +4,20 @@ import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import xyz.snwjas.blog.mapper.LinkMapper;
+import xyz.snwjas.blog.model.PageResult;
 import xyz.snwjas.blog.model.entity.LinkEntity;
 import xyz.snwjas.blog.model.params.LinkSearchParam;
 import xyz.snwjas.blog.model.vo.LinkVO;
 import xyz.snwjas.blog.service.LinkService;
-import xyz.snwjas.blog.model.PageResult;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Link Service Impl
@@ -70,12 +71,10 @@ public class LinkServiceImpl implements LinkService {
 	}
 
 	@Override
-	public List<LinkVO> covertToListVO(List<LinkEntity> linkEntityList) {
-		List<LinkVO> linkVOList = new ArrayList<>();
-		for (LinkEntity linkEntity : linkEntityList) {
-			linkVOList.add(covertToVO(linkEntity));
-		}
-		return linkVOList;
+	public List<LinkVO> covertToListVO(@NonNull List<LinkEntity> linkEntityList) {
+		return linkEntityList.stream().parallel()
+				.map(this::covertToVO)
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -88,10 +87,15 @@ public class LinkServiceImpl implements LinkService {
 	private Wrapper<LinkEntity> getSearchWrapper(LinkSearchParam param) {
 		String name = param.getName();
 		String url = param.getUrl();
+		String keyword = param.getKeyword();
 
 		return Wrappers.lambdaQuery(LinkEntity.class)
-				.like(StringUtils.hasText(name), LinkEntity::getName, name)
-				.like(StringUtils.hasText(url), LinkEntity::getName, url)
+				.like(!StringUtils.hasText(keyword) && StringUtils.hasText(name), LinkEntity::getName, name)
+				.like(!StringUtils.hasText(keyword) && StringUtils.hasText(url), LinkEntity::getUrl, url)
+				.and(StringUtils.hasText(keyword), wrap -> wrap
+						.like(LinkEntity::getName, keyword)
+						.or()
+						.like(LinkEntity::getUrl, keyword))
 				.orderByDesc(LinkEntity::getTopRank)
 				.orderByDesc(LinkEntity::getId)
 				;

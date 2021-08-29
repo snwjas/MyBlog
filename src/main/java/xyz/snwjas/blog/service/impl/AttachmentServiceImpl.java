@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -101,7 +102,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 		}
 
 		attachmentMapper.insert(attachment);
-		return covertTo(attachment);
+		return covertToVO(attachment);
 	}
 
 	@Override
@@ -183,18 +184,15 @@ public class AttachmentServiceImpl implements AttachmentService {
 	}
 
 	@Override
-	public AttachmentVO covertTo(AttachmentEntity attachmentEntity) {
+	public AttachmentVO covertToVO(AttachmentEntity attachmentEntity) {
 		return new AttachmentVO().convertFrom(attachmentEntity);
 	}
 
 	@Override
-	public List<AttachmentVO> covertToListVO(List<AttachmentEntity> attachmentEntityList) {
-		List<AttachmentVO> voList = new ArrayList<>();
-		for (AttachmentEntity attachmentEntity : attachmentEntityList) {
-			AttachmentVO vo = new AttachmentVO().convertFrom(attachmentEntity);
-			voList.add(vo);
-		}
-		return voList;
+	public List<AttachmentVO> covertToListVO(@NonNull List<AttachmentEntity> attachmentEntityList) {
+		return attachmentEntityList.stream().parallel()
+				.map(this::covertToVO)
+				.collect(Collectors.toList());
 	}
 
 	// 获取搜索条件
@@ -205,6 +203,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 		return Wrappers.lambdaQuery(AttachmentEntity.class)
 				.like(StringUtils.hasText(name), AttachmentEntity::getName, name)
 				.eq(StringUtils.hasText(mediaType), AttachmentEntity::getMediaType, mediaType)
+				.orderByDesc(AttachmentEntity::getId)
 				;
 
 	}

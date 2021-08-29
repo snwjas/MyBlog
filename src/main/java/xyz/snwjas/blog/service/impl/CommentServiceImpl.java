@@ -27,7 +27,6 @@ import xyz.snwjas.blog.utils.IPUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -244,20 +243,16 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	public List<CommentDetailVO> covertToListDetailVO(List<CommentEntity> commentEntityList) {
-		List<CommentDetailVO> commentDetailVOList = new ArrayList<>();
-		for (CommentEntity commentEntity : commentEntityList) {
-			commentDetailVOList.add(covertToDetailVO(commentEntity));
-		}
-		return commentDetailVOList;
+		return commentEntityList.stream().parallel()
+				.map(this::covertToDetailVO)
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<CommentSimpleVO> covertToListSimpleVO(List<CommentEntity> commentEntityList) {
-		List<CommentSimpleVO> commentDetailVOList = new ArrayList<>();
-		for (CommentEntity commentEntity : commentEntityList) {
-			commentDetailVOList.add(covertToSimpleVO(commentEntity));
-		}
-		return commentDetailVOList;
+		return commentEntityList.stream().parallel()
+				.map(this::covertToSimpleVO)
+				.collect(Collectors.toList());
 	}
 
 	// 获取搜索条件

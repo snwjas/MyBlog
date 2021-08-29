@@ -15,7 +15,6 @@ import xyz.snwjas.blog.service.LogService;
 import xyz.snwjas.blog.utils.IPUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -87,12 +86,10 @@ public class LogServiceImpl implements LogService {
 
 
 	@Override
-	public List<LogVO> covertToListVO(List<LogEntity> logEntityList) {
-		List<LogVO> logVOList = new ArrayList<>();
-		for (LogEntity logEntity : logEntityList) {
-			logVOList.add(covertToVO(logEntity));
-		}
-		return logVOList;
+	public List<LogVO> covertToListVO(@NonNull List<LogEntity> logEntityList) {
+		return logEntityList.stream().parallel()
+				.map(this::covertToVO)
+				.collect(Collectors.toList());
 	}
 
 	@Override

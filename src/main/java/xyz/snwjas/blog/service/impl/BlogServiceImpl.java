@@ -186,19 +186,18 @@ public class BlogServiceImpl implements BlogService {
 		String url = StringUtils.hasText(blogEntity.getUrl())
 				? blogEntity.getUrl()
 				: blogEntity.getTitle();
-		if (Objects.nonNull(getByUrl(url))) {
+		if (isExist(url)) {
 			// 数据库长度 255
 			url = (System.currentTimeMillis() + url).substring(0, 255);
 		}
 		blogEntity.setUrl(url);
 		// 设置分类
 		CategoryVO category = vo.getCategory();
-		int categoryId = Objects.nonNull(category)
-				&& Objects.nonNull(category.getId())
-				&& category.getId() > 0
-				? category.getId()
-				: 0;
-		blogEntity.setCategoryId(categoryId);
+		Integer cid = Optional.ofNullable(category)
+				.map(CategoryVO::getId)
+				.filter(e -> e > 0)
+				.orElse(0);
+		blogEntity.setCategoryId(cid);
 		// 执行插入
 		blogMapper.insert(blogEntity);
 		// 新增记录注解id
@@ -207,6 +206,13 @@ public class BlogServiceImpl implements BlogService {
 		tagService.updateBlogUsed(blogId, vo.getTags());
 
 		return blogId;
+	}
+
+	/**
+	 * 添加或更新博客信息时，对信息的检验修正
+	 */
+	private BlogDetailVO checkBlogData(BlogDetailVO vo) {
+		return null;
 	}
 
 	@Override
@@ -272,6 +278,16 @@ public class BlogServiceImpl implements BlogService {
 	}
 
 	@Override
+	public boolean isExist(String url) {
+		BlogEntity entity = blogMapper.selectOne(
+				Wrappers.lambdaQuery(BlogEntity.class)
+						.select(BlogEntity::getUrl)
+						.eq(BlogEntity::getUrl, url)
+		);
+		return Objects.nonNull(entity);
+	}
+
+	@Override
 	public PageResult<BlogSimpleVO> covertToPageResult(IPage<BlogEntity> blogPage) {
 
 		List<BlogSimpleVO> blogSimpleVOList = covertToListSimpleVO(blogPage.getRecords());
@@ -281,12 +297,9 @@ public class BlogServiceImpl implements BlogService {
 
 	@Override
 	public List<BlogSimpleVO> covertToListSimpleVO(List<BlogEntity> blogEntityList) {
-		List<BlogSimpleVO> blogSimpleVOList = new ArrayList<>();
-		for (BlogEntity blogEntity : blogEntityList) {
-			BlogSimpleVO blogSimpleVO = covertToSimpleVO(blogEntity);
-			blogSimpleVOList.add(blogSimpleVO);
-		}
-		return blogSimpleVOList;
+		return blogEntityList.stream().parallel()
+				.map(this::covertToSimpleVO)
+				.collect(Collectors.toList());
 	}
 
 	@Override

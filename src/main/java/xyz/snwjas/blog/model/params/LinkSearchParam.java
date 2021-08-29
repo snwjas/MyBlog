@@ -23,4 +23,7 @@ public class LinkSearchParam extends BasePageParam {
 	@ApiModelProperty("友链url")
 	private String url;
 
+	@ApiModelProperty("关键词：名称或url")
+	private String keyword;
+
 }

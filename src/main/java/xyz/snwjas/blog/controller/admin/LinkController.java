@@ -2,11 +2,13 @@ package xyz.snwjas.blog.controller.admin;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.sun.istack.internal.NotNull;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import xyz.snwjas.blog.constant.OtherOptionEnum;
 import xyz.snwjas.blog.model.base.ValidGroupType;
 import xyz.snwjas.blog.model.entity.LinkEntity;
 import xyz.snwjas.blog.model.params.LinkSearchParam;
@@ -14,6 +16,7 @@ import xyz.snwjas.blog.model.vo.LinkVO;
 import xyz.snwjas.blog.service.LinkService;
 import xyz.snwjas.blog.model.PageResult;
 import xyz.snwjas.blog.model.R;
+import xyz.snwjas.blog.service.OptionsService;
 import xyz.snwjas.blog.utils.RUtils;
 
 import javax.validation.Valid;
@@ -32,6 +35,10 @@ public class LinkController {
 
 	@Autowired
 	private LinkService linkService;
+
+	@Autowired
+	private OptionsService optionsService;
+
 
 	@PostMapping("/list")
 	@ApiOperation("获取友链列表信息")
@@ -62,4 +69,13 @@ public class LinkController {
 		return RUtils.commonFailOrNot(i, "友链添加");
 	}
 
+	@PostMapping("/update/parser")
+	@ApiOperation("更新网站Logo（favicon）解析API")
+	public R updateUrlLogoParser(@RequestParam("parser") @NotNull String urlLogoParser) {
+		int i = optionsService.setAnyway(OtherOptionEnum.URL_FAVICON_PARSER.key(), urlLogoParser);
+		if (i > 0) {
+			optionsService.resetOptionsCache();
+		}
+		return RUtils.commonFailOrNot(i, "友链Logo解析API修改");
+	}
 }

@@ -45,7 +45,7 @@ public interface AttachmentService {
 
 	PageResult<AttachmentVO> covertToPageResult(IPage<AttachmentEntity> page);
 
-	AttachmentVO covertTo(AttachmentEntity attachmentEntity);
+	AttachmentVO covertToVO(AttachmentEntity attachmentEntity);
 
 	List<AttachmentVO> covertToListVO(List<AttachmentEntity> attachmentEntityList);
 

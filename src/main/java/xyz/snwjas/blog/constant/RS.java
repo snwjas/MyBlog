@@ -53,6 +53,8 @@ public enum RS {
 
 	METHOD_NOT_SUPPORTED(6002, "请求方法有误"),
 
+	PAGE_NOT_FOUND(6003, "请求目标不存在"),
+
 	/**
 	 * 系统错误
 	 */

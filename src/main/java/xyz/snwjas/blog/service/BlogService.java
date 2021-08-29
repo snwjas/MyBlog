@@ -103,6 +103,11 @@ public interface BlogService {
 	boolean isExist(int blogId);
 
 	/**
+	 * 根据博客路径判断博客是否存在
+	 */
+	boolean isExist(String url);
+
+	/**
 	 * BlogEntity to BlogSimpleVO
 	 */
 	BlogSimpleVO covertToSimpleVO(BlogEntity blogEntity);

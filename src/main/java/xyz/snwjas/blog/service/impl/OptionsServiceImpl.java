@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import xyz.snwjas.blog.annotation.ActionRecord;
 import xyz.snwjas.blog.constant.MyBlogOptionEnum;
+import xyz.snwjas.blog.constant.OptionEnum;
 import xyz.snwjas.blog.mapper.OptionsMapper;
 import xyz.snwjas.blog.model.entity.OptionsEntity;
 import xyz.snwjas.blog.model.enums.LogType;
 import xyz.snwjas.blog.model.vo.OptionVO;
 import xyz.snwjas.blog.service.OptionsService;
 import xyz.snwjas.blog.support.cache.MemoryCacheStore;
+import xyz.snwjas.blog.utils.ClassUtils;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
@@ -36,6 +38,9 @@ public class OptionsServiceImpl implements OptionsService {
 	private static final String OPTIONS_CACHE_KEY = "options";
 
 	private static final int OPTIONS_CACHE_TIMEOUT = 86400;
+
+	private static final String OPTIONS_KEY_TYPE_MAP = "options_key_type_map";
+
 
 	@Override
 	public OptionVO get(String key) {
@@ -102,26 +107,30 @@ public class OptionsServiceImpl implements OptionsService {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public Map<String, Object> listAll() {
-		@SuppressWarnings("unchecked")
 		Map<String, Object> optionMap = (Map<String, Object>) cache.get(OPTIONS_CACHE_KEY);
 		if (Objects.isNull(optionMap)) {
-			List<OptionsEntity> allOptions = optionsMapper.selectList(Wrappers.emptyWrapper());
-			Map<String, MyBlogOptionEnum> optionEnumMap = getMyBlogOptionEnumMap();
-			optionMap = new HashMap<>();
-			for (OptionsEntity option : allOptions) {
-				String optionKey = option.getOptionKey();
-				MyBlogOptionEnum enumm = optionEnumMap.get(optionKey);
-				if (Objects.isNull(enumm)) {
-					optionMap.put(optionKey, option.getOptionValue());
-					continue;
+			synchronized (this) {
+				optionMap = (Map<String, Object>) cache.get(OPTIONS_CACHE_KEY);
+				if (Objects.isNull(optionMap)) {
+					List<OptionsEntity> allOptions = optionsMapper.selectList(Wrappers.emptyWrapper());
+					Map<String, Class<?>> optionKeyTypeMap = getOptionEnumMap();
+					optionMap = new HashMap<>();
+					for (OptionsEntity option : allOptions) {
+						String optionKey = option.getOptionKey();
+						Class<?> aClass = optionKeyTypeMap.get(optionKey);
+						if (Objects.isNull(aClass)) {
+							optionMap.put(optionKey, option.getOptionValue());
+							continue;
+						}
+						Object optionValue = getTrueOptionValue(option.getOptionValue(), aClass);
+						optionMap.put(optionKey, optionValue);
+					}
+					cache.set(OPTIONS_CACHE_KEY, optionMap, OPTIONS_CACHE_TIMEOUT);
 				}
-				Object optionValue = getTrueOptionValue(option.getOptionValue(), enumm.type());
-				optionMap.put(optionKey, optionValue);
 			}
-			cache.set(OPTIONS_CACHE_KEY, optionMap, OPTIONS_CACHE_TIMEOUT);
 		}
-
 		return optionMap;
 	}
 
@@ -153,10 +162,17 @@ public class OptionsServiceImpl implements OptionsService {
 	}
 
 	// option key as map key
-	private Map<String, MyBlogOptionEnum> getMyBlogOptionEnumMap() {
-		HashMap<String, MyBlogOptionEnum> map = new HashMap<>();
-		for (MyBlogOptionEnum value : MyBlogOptionEnum.values()) {
-			map.put(value.key(), value);
+	// 获取所有已配置设置项的数据类型
+	private Map<String, Class<?>> getOptionEnumMap() {
+		HashMap<String, Class<?>> map = (HashMap<String, Class<?>>) cache.get(OPTIONS_KEY_TYPE_MAP);
+		if (Objects.isNull(map)) {
+			map = new HashMap<>();
+			for (Class<OptionEnum> clazz : ClassUtils.getAllClassByInterface(OptionEnum.class)) {
+				for (OptionEnum oenum : clazz.getEnumConstants()) {
+					map.put(oenum.key(), oenum.type());
+				}
+			}
+			cache.set(OPTIONS_KEY_TYPE_MAP, map);
 		}
 		return map;
 	}

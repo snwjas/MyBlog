@@ -128,12 +128,9 @@ public class CategoryServiceImpl implements CategoryService {
 
 	@Override
 	public List<CategoryVO> covertToListVO(List<CategoryEntity> categoryEntityList) {
-		List<CategoryVO> categoryVOList = new ArrayList<>();
-		for (CategoryEntity categoryEntity : categoryEntityList) {
-			CategoryVO categoryVO = covertToVO(categoryEntity);
-			categoryVOList.add(categoryVO);
-		}
-		return categoryVOList;
+		return categoryEntityList.stream().parallel()
+				.map(this::covertToVO)
+				.collect(Collectors.toList());
 	}
 
 	@Override

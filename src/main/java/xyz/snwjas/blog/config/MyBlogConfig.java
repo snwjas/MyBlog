@@ -4,9 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.View;
-import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 import xyz.snwjas.blog.support.cache.MemoryCacheStore;
 import xyz.snwjas.blog.support.wordfilter.WordContext;
 import xyz.snwjas.blog.support.wordfilter.WordFilter;
@@ -59,14 +56,5 @@ public class MyBlogConfig {
 		executor.setAwaitTerminationSeconds(3);
 		return executor;
 	}
-
-	/**
-	 * error page 返回json
-	 */
-	@Bean("error")
-	public View error() {
-		ModelAndView view = new ModelAndView(new MappingJackson2JsonView());
-		return view.getView();
-	}
-
+	
 }
