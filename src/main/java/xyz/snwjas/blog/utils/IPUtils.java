@@ -1,5 +1,6 @@
 package xyz.snwjas.blog.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -58,7 +59,7 @@ public class IPUtils {
 					+ (Integer.parseInt(octets[2]) << 8)
 					+ Integer.parseInt(octets[3]);
 		}
-		return 0;
+		throw new IllegalArgumentException("IPv4字符串不合法！");
 	}
 
 	/**
@@ -80,27 +81,23 @@ public class IPUtils {
 	 */
 	public static String getIpAddress(HttpServletRequest request) {
 		String ip = request.getHeader("X-Forwarded-For");
-		if (!isIPv4Valid(ip)) {
-			String[] checkedHeaders = new String[]{
-					"Proxy-Client-IP", "WL-Proxy-Client-IP"
-					, "HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"};
-			for (String checkedHeader : checkedHeaders) {
-				if (!isIPv4Valid(ip)) {
-					ip = request.getHeader(checkedHeader);
-				}
+		if (StringUtils.isNotEmpty(ip) && !"unknown".equalsIgnoreCase(ip)) {
+			// 多次反向代理后会有多个ip值，第一个ip才是真实ip
+			int index = ip.indexOf(",");
+			return index != -1 ? ip.substring(0, index) : ip;
+		}
+		ip = request.getHeader("X-Real-IP");
+		if (StringUtils.isNotEmpty(ip) && !"unknown".equalsIgnoreCase(ip)) {
+			return ip;
+		}
+		for (String hd : new String[]{"Proxy-Client-IP", "WL-Proxy-Client-IP",
+				"HTTP_CLIENT_IP", "HTTP_X_FORWARDED_FOR"}) {
+			if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
+				ip = request.getHeader(hd);
 			}
-			if (!isIPv4Valid(ip)) {
-				ip = request.getRemoteAddr();
-			}
-		} else if (ip.length() > 15) {
-			String[] ips = ip.split(",");
-			for (String s : ips) {
-				String strIp = s.trim();
-				if (!("unknown".equalsIgnoreCase(strIp))) {
-					ip = strIp;
-					break;
-				}
-			}
+		}
+		if (StringUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
+			ip = request.getRemoteAddr();
 		}
 		return ip;
 	}

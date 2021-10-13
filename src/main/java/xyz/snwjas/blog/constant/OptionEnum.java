@@ -22,4 +22,45 @@ public interface OptionEnum {
 	 */
 	String defaultValue();
 
+
+	/**
+	 * 获得optionValue的原类型值
+	 */
+	@SuppressWarnings("unchecked")
+	static <T> T getTrueOptionValue(String value, Class<T> type) {
+		if (type.isAssignableFrom(String.class)) {
+			return (T) value;
+		}
+
+		if (type.isAssignableFrom(Integer.class)) {
+			return (T) Integer.valueOf(value);
+		}
+
+		if (type.isAssignableFrom(Long.class)) {
+			return (T) Long.valueOf(value);
+		}
+
+		if (type.isAssignableFrom(Boolean.class)) {
+			return (T) Boolean.valueOf(value);
+		}
+
+		if (type.isAssignableFrom(Short.class)) {
+			return (T) Short.valueOf(value);
+		}
+
+		if (type.isAssignableFrom(Byte.class)) {
+			return (T) Byte.valueOf(value);
+		}
+
+		if (type.isAssignableFrom(Double.class)) {
+			return (T) Double.valueOf(value);
+		}
+
+		if (type.isAssignableFrom(Float.class)) {
+			return (T) Float.valueOf(value);
+		}
+
+		return (T) value;
+	}
+
 }

@@ -124,7 +124,7 @@ public class OptionsServiceImpl implements OptionsService {
 							optionMap.put(optionKey, option.getOptionValue());
 							continue;
 						}
-						Object optionValue = getTrueOptionValue(option.getOptionValue(), aClass);
+						Object optionValue = OptionEnum.getTrueOptionValue(option.getOptionValue(), aClass);
 						optionMap.put(optionKey, optionValue);
 					}
 					cache.set(OPTIONS_CACHE_KEY, optionMap, OPTIONS_CACHE_TIMEOUT);
@@ -163,6 +163,7 @@ public class OptionsServiceImpl implements OptionsService {
 
 	// option key as map key
 	// 获取所有已配置设置项的数据类型
+	@SuppressWarnings("unchecked")
 	private Map<String, Class<?>> getOptionEnumMap() {
 		HashMap<String, Class<?>> map = (HashMap<String, Class<?>>) cache.get(OPTIONS_KEY_TYPE_MAP);
 		if (Objects.isNull(map)) {
@@ -175,46 +176,6 @@ public class OptionsServiceImpl implements OptionsService {
 			cache.set(OPTIONS_KEY_TYPE_MAP, map);
 		}
 		return map;
-	}
-
-	/**
-	 * 获得optionValue的原类型值
-	 */
-	@SuppressWarnings("unchecked")
-	private <T> T getTrueOptionValue(String value, Class<T> type) {
-		if (type.isAssignableFrom(String.class)) {
-			return (T) value;
-		}
-
-		if (type.isAssignableFrom(Integer.class)) {
-			return (T) Integer.valueOf(value);
-		}
-
-		if (type.isAssignableFrom(Long.class)) {
-			return (T) Long.valueOf(value);
-		}
-
-		if (type.isAssignableFrom(Boolean.class)) {
-			return (T) Boolean.valueOf(value);
-		}
-
-		if (type.isAssignableFrom(Short.class)) {
-			return (T) Short.valueOf(value);
-		}
-
-		if (type.isAssignableFrom(Byte.class)) {
-			return (T) Byte.valueOf(value);
-		}
-
-		if (type.isAssignableFrom(Double.class)) {
-			return (T) Double.valueOf(value);
-		}
-
-		if (type.isAssignableFrom(Float.class)) {
-			return (T) Float.valueOf(value);
-		}
-
-		return (T) value;
 	}
 
 }
