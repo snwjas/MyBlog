@@ -26,12 +26,9 @@ public class MyAuthenticationFailureHandler implements AuthenticationFailureHand
 	@Override
 	public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response
 			, AuthenticationException exception) throws IOException, ServletException {
-		R result;
-		if (exception instanceof BadCredentialsException) {
-			result = RUtils.fail(RS.USERNAME_PASSWORD_ERROR);
-		} else {
-			result = RUtils.fail(RS.SYSTEM_ERROR);
-		}
+		R result = RUtils.fail(exception instanceof BadCredentialsException
+				? RS.USERNAME_PASSWORD_ERROR
+				: RS.SYSTEM_ERROR);
 		RWriterUtils.writeJson(response, result);
 	}
 }

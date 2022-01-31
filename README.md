@@ -2,7 +2,7 @@
 
 **传送门**
 
-- 预览地址：http://myblog.snwjas.xyz/madmin
+- 预览地址：http://myblog.refrain.xyz/madmin
 - 后台管理：[Github](https://github.com/snwjas/MyBlog) | [Gitee](https://gitee.com/snwjas/my-blog)
 - 后台前端：[Github](https://github.com/snwjas/MyBlog-Admin) | [Gitee](https://gitee.com/snwjas/my-blog-admin)
 - 前台前端：[Github](https://github.com/snwjas/MyBlog-App) | [Gitee](https://gitee.com/snwjas/my-blog-app)
@@ -18,6 +18,14 @@ MyBlog主要是基于 SpringBoot + Vue 前后端分离开发的一款动态个�
 
 
 ## 技术使用
+
+**规范实现**：
+
+- 统一请求响应
+- 统一异常处理
+- Java Bean Validation参数校验
+- 面向AOP编程：通过自定义注解实现接口限流、操作日志记录等
+- ……
 
 **开发环境**
 
