@@ -2,4 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="xyz.snwjas.blog.mapper.LinkMapper">
 
+	<update id="updateLogoByParser">
+		update link
+		set logo = replace(#{parser} , '{}' , url)
+		where 1=1
+	</update>
 </mapper>

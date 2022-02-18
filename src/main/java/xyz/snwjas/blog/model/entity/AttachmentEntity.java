@@ -50,6 +50,10 @@ public class AttachmentEntity extends BaseEntity {
 	@TableField("thumb_path")
 	private String thumbPath;
 
+	@ApiModelProperty(value = "文件分组")
+	@TableField("team")
+	private String team;
+
 	@ApiModelProperty(value = "文件为图片时，图片的宽度像素")
 	@TableField(value = "width")
 	private Integer width;

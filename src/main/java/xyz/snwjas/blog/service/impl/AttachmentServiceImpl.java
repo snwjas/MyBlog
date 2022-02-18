@@ -28,7 +28,9 @@ import xyz.snwjas.blog.utils.LambdaTypeUtils;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -66,13 +68,11 @@ public class AttachmentServiceImpl implements AttachmentService {
 
 
 	@Override
-	public AttachmentVO add(MultipartFile file) {
-		// 文件中不能出现 ‘/’ , 会影响后续字符串切割
-		String fileName = org.apache.commons.lang3.StringUtils.remove(file.getOriginalFilename(), "/");
-
+	public AttachmentVO add(MultipartFile file, String team) {
+		String filename = file.getOriginalFilename();
 		String contentType = file.getContentType();
 
-		File originalFile = getFileSavedPath(fileName);
+		File originalFile = getFileSavedPath(filename);
 		File thumbnailFile = null;
 		try {
 			// 保存原文件
@@ -89,10 +89,11 @@ public class AttachmentServiceImpl implements AttachmentService {
 		String visitPath = "/static/" + originalFile.getParentFile().getName() + "/";
 
 		AttachmentEntity attachment = new AttachmentEntity();
-		attachment.setName(fileName)
-				.setMediaType(file.getContentType())
+		attachment.setName(filename)
+				.setMediaType(contentType)
 				.setSize(file.getSize())
-				.setPath(visitPath + originalFile.getName());
+				.setPath(visitPath + originalFile.getName())
+				.setTeam(Objects.isNull(team) ? "" : team);
 
 		if (Objects.nonNull(thumbnailFile)) {
 			int[] pixel = FileUtils.getImagePixel(originalFile);
@@ -107,8 +108,6 @@ public class AttachmentServiceImpl implements AttachmentService {
 
 	@Override
 	public int updateNameById(int attachmentId, String attachmentName) {
-		// 文件中不能出现 ‘/’ , 会影响后续字符串切割
-		attachmentName = org.apache.commons.lang3.StringUtils.remove(attachmentName, "/");
 		return attachmentMapper.update(null,
 				Wrappers.lambdaUpdate(AttachmentEntity.class)
 						.eq(AttachmentEntity::getId, attachmentId)
@@ -157,6 +156,22 @@ public class AttachmentServiceImpl implements AttachmentService {
 	}
 
 	@Override
+	public int updateTeam(List<Integer> attachmentIds, String team) {
+		if (CollectionUtils.isEmpty(attachmentIds)) {
+			return 0;
+		}
+		Set<Integer> idSet = attachmentIds.stream()
+				.filter(id -> Objects.nonNull(id) && id > 0)
+				.collect(Collectors.toSet());
+
+		return attachmentMapper.update(null,
+				Wrappers.lambdaUpdate(AttachmentEntity.class)
+						.set(AttachmentEntity::getTeam, team)
+						.in(AttachmentEntity::getId, idSet)
+		);
+	}
+
+	@Override
 	public List<String> listAllMediaTypes() {
 		QueryWrapper<AttachmentEntity> wrapper = new QueryWrapper<AttachmentEntity>()
 				.select("DISTINCT " + LambdaTypeUtils.getColumnName(AttachmentEntity::getMediaType));
@@ -165,6 +180,19 @@ public class AttachmentServiceImpl implements AttachmentService {
 
 		return attachmentEntityList.stream()
 				.map(AttachmentEntity::getMediaType)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<String> listAllTeams() {
+		QueryWrapper<AttachmentEntity> wrapper = new QueryWrapper<AttachmentEntity>()
+				.select("DISTINCT " + LambdaTypeUtils.getColumnName(AttachmentEntity::getTeam));
+
+		List<AttachmentEntity> attachmentEntityList = attachmentMapper.selectList(wrapper);
+
+		return attachmentEntityList.stream()
+				.map(AttachmentEntity::getTeam)
 				.filter(Objects::nonNull)
 				.collect(Collectors.toList());
 	}
@@ -199,45 +227,43 @@ public class AttachmentServiceImpl implements AttachmentService {
 	private Wrapper<AttachmentEntity> getAttachmentSearchWrapper(AttachmentSearchParam param) {
 		String name = param.getName();
 		String mediaType = param.getMediaType();
+		String team = param.getTeam();
+		String likeTeam = param.getLikeTeam();
 
 		return Wrappers.lambdaQuery(AttachmentEntity.class)
-				.like(StringUtils.hasText(name), AttachmentEntity::getName, name)
-				.eq(StringUtils.hasText(mediaType), AttachmentEntity::getMediaType, mediaType)
+				.like(!StringUtils.isEmpty(name), AttachmentEntity::getName, name)
+				.like(Objects.isNull(team) && !StringUtils.isEmpty(likeTeam), AttachmentEntity::getTeam, likeTeam)
+				.eq(Objects.nonNull(mediaType), AttachmentEntity::getMediaType, mediaType)
+				.eq(Objects.nonNull(team) || "".equals(likeTeam), AttachmentEntity::getTeam, team)
 				.orderByDesc(AttachmentEntity::getId)
 				;
-
 	}
 
 	/**
 	 * 获取文件完整保存路径（如 /home/files/file.md）
+	 * 文件名命名：毫秒时间戳-UUID.后缀
 	 *
 	 * @param fileName 文件名（包含扩展名）
 	 * @return {@link File}
 	 */
 	public File getFileSavedPath(String fileName) {
-		// 获取保存目录
-		String savePath = properties.getFileSavePath();
 		// 保存的文件夹以年月命名
-		// String date = LocalDate.now().toString();
 		String date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
-		File file = new File(savePath + File.separatorChar + date);
-		if (!file.exists()) {
-			file.mkdirs();
+		Path dest = Paths.get(properties.getFileSavePath(), date).toAbsolutePath();
+
+		File destFile = dest.toFile();
+		if (!destFile.exists()) {
+			destFile.mkdirs();
 		}
 
-		String uuid = "-" + org.apache.commons.lang3.StringUtils.remove(UUID.randomUUID().toString(), '-');
+		String timestamp = String.valueOf(Instant.now().toEpochMilli());
+		String uuid = UUID.randomUUID().toString().replaceAll("-", "");
 
-		// 如果 fileName 字节数大于255-uuid.length()，截取
-		byte[] fileNameBytes = fileName.getBytes(StandardCharsets.UTF_8);
-		int fileNameLength = 255 - uuid.length();
-		if (fileNameBytes.length > fileNameLength) {
-			fileName = new String(Arrays.copyOf(fileNameBytes, fileNameLength));
-		}
+		String[] nameExt = FileUtils.getFileNameAndExt(fileName);
 
-		// 获取文件名
-		String newFileName = FileUtils.fileNameAppend(fileName, uuid);
+		String newFileName = timestamp + "-" + uuid + nameExt[1];
 
-		return new File(file, newFileName);
+		return Paths.get(dest.toString(), newFileName).toFile();
 	}
 
 	/**

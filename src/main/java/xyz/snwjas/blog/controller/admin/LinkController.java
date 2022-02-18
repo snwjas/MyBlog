@@ -71,10 +71,11 @@ public class LinkController {
 
 	@PostMapping("/update/parser")
 	@ApiOperation("更新网站Logo（favicon）解析API")
-	public R updateUrlLogoParser(@RequestParam("parser") @NotNull String urlLogoParser) {
-		int i = optionsService.setAnyway(OtherOptionEnum.URL_FAVICON_PARSER.key(), urlLogoParser);
+	public R updateUrlLogoParser(@RequestParam("parser") @NotNull String logoParser) {
+		int i = optionsService.setAnyway(OtherOptionEnum.URL_FAVICON_PARSER.key(), logoParser);
 		if (i > 0) {
 			optionsService.resetOptionsCache();
+			linkService.updateLogoParser(logoParser);
 		}
 		return RUtils.commonFailOrNot(i, "友链Logo解析API修改");
 	}

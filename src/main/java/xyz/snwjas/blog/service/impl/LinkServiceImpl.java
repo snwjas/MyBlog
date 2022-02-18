@@ -66,6 +66,11 @@ public class LinkServiceImpl implements LinkService {
 	}
 
 	@Override
+	public int updateLogoParser(String parser) {
+		return linkMapper.updateLogoByParser(parser);
+	}
+
+	@Override
 	public LinkVO covertToVO(LinkEntity linkEntity) {
 		return new LinkVO().convertFrom(linkEntity);
 	}

@@ -45,6 +45,13 @@ public interface LinkService {
 	 */
 	LinkVO getById(int linkId);
 
+	/**
+	 * 更新 URL Logo 解析器
+	 * @param parser
+	 * @return
+	 */
+	int updateLogoParser(String parser);
+
 	LinkVO covertToVO(LinkEntity linkEntity);
 
 	List<LinkVO> covertToListVO(List<LinkEntity> linkEntityList);

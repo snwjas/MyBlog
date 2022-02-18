@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.io.File;
+import java.nio.file.Paths;
 
 /**
  * 博客配置
@@ -44,7 +44,6 @@ public class MyBlogProperties {
 	/**
 	 * 上传文件保存路径
 	 */
-	private String fileSavePath = System.getProperty("user.home")
-			+ File.separatorChar + "MyBlog" + File.separatorChar + "files";
+	private String fileSavePath = Paths.get(System.getProperty("user.home"), "MyBlog", "files").toString();
 
 }

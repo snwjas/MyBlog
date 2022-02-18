@@ -1,6 +1,7 @@
 package xyz.snwjas.blog.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -14,6 +15,23 @@ import java.io.IOException;
  */
 @Slf4j
 public class FileUtils {
+
+	/**
+	 * 根据文件名获取文件名称与后缀
+	 *
+	 * @param fileName
+	 * @return [name, ext]，后缀含"."
+	 */
+	public static String[] getFileNameAndExt(String fileName) {
+		if (StringUtils.isEmpty(fileName)) {
+			return new String[]{"", ""};
+		}
+		int len = fileName.length();
+		int idx = fileName.lastIndexOf('.');
+		String name = fileName.substring(0, idx >= 0 ? idx : len);
+		String ext = idx >= 0 && idx < len - 1 ? fileName.substring(idx, len) : "";
+		return new String[]{name, ext};
+	}
 
 	/**
 	 * 文件名后添加字符串，如 word.txt 添加‘-java’, 效果 word-java.txt

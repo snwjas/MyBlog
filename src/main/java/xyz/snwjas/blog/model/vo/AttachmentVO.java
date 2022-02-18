@@ -49,6 +49,9 @@ public class AttachmentVO implements BeanConvert, Serializable {
 	@ApiModelProperty("附件缩略图路径")
 	private String thumbPath;
 
+	@ApiModelProperty(value = "文件分组")
+	private String team;
+
 	@ApiModelProperty("附件为图片时的宽度")
 	private Integer width;
 

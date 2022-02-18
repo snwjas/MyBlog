@@ -9,6 +9,7 @@ import xyz.snwjas.blog.model.base.BeanConvert;
 import xyz.snwjas.blog.model.base.ValidGroupType;
 
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -29,12 +30,12 @@ public class LinkVO implements BeanConvert, Serializable {
 	@ApiModelProperty("友链ID")
 	private Integer id;
 
-	@NotNull(groups = {ValidGroupType.Save.class, ValidGroupType.Update.class})
+	@NotBlank(groups = {ValidGroupType.Save.class, ValidGroupType.Update.class}, message = "友链名称不能为空")
 	@Length(max = 127, groups = {ValidGroupType.Save.class, ValidGroupType.Update.class})
 	@ApiModelProperty("友链名")
 	private String name;
 
-	@NotNull(groups = {ValidGroupType.Save.class, ValidGroupType.Update.class})
+	@NotBlank(groups = {ValidGroupType.Save.class, ValidGroupType.Update.class}, message = "友链地址不能为空")
 	@Length(max = 255, groups = {ValidGroupType.Save.class, ValidGroupType.Update.class})
 	@ApiModelProperty("友链地址")
 	private String url;

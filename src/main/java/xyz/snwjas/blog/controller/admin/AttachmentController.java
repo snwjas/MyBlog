@@ -20,6 +20,7 @@ import xyz.snwjas.blog.utils.RUtils;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Objects;
 
@@ -42,11 +43,12 @@ public class AttachmentController {
 
 	@PostMapping("/upload")
 	@ApiOperation("上传附件")
-	public R upload(@RequestPart("file") MultipartFile file) {
+	public R upload(@RequestPart("file") MultipartFile file,
+	                @RequestParam(value = "team", required = false) String team) {
 		// if (file.getSize() > multipartProperties.getMaxFileSize().toBytes()) {
 		// 	return RUtils.fail("上传文件过大");
 		// }
-		AttachmentVO vo = attachmentService.add(file);
+		AttachmentVO vo = attachmentService.add(file, team);
 		if (Objects.isNull(vo)) {
 			return RUtils.fail("文件上传出错");
 		}
@@ -66,6 +68,13 @@ public class AttachmentController {
 	public R listAllMediaTypes() {
 		List<String> mediaTypes = attachmentService.listAllMediaTypes();
 		return RUtils.success("所有文件类型", mediaTypes);
+	}
+
+	@GetMapping("/list/team")
+	@ApiOperation("获取所有文件分组")
+	public R listAllTeams() {
+		List<String> teams = attachmentService.listAllTeams();
+		return RUtils.success("所有文件分组", teams);
 	}
 
 	@DeleteMapping("/delete/{attachmentId}")
@@ -89,5 +98,12 @@ public class AttachmentController {
 		return RUtils.commonFailOrNot(i, "附件名修改");
 	}
 
+	@PostMapping("/update/team")
+	@ApiOperation("修改附件分组")
+	public R updateTeam(@RequestParam("ids") @Validated ListParam<Integer> ids,
+	                    @RequestParam("team") @NotNull String team) {
+		int i = attachmentService.updateTeam(ids, team);
+		return RUtils.commonFailOrNot(i, String.format("移动到分组[%s]", team));
+	}
 
 }

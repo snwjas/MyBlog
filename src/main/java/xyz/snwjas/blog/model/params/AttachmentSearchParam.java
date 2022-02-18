@@ -25,6 +25,12 @@ public class AttachmentSearchParam extends BasePageParam {
 	@ApiModelProperty("附件类型")
 	private String mediaType;
 
+	@ApiModelProperty("附件分组")
+	private String team;
+
+	@ApiModelProperty("附件分组模糊查询字段")
+	private String likeTeam;
+
 	private LocalDateTime createTime;
 
 }

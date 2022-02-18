@@ -19,7 +19,7 @@ public interface AttachmentService {
 	/**
 	 * 添加附件
 	 */
-	AttachmentVO add(MultipartFile file);
+	AttachmentVO add(MultipartFile file, String team);
 
 	/**
 	 * 修改附件名
@@ -37,9 +37,19 @@ public interface AttachmentService {
 	int deleteById(List<Integer> attachmentIds);
 
 	/**
+	 * 更新附件分组
+	 */
+	int updateTeam(List<Integer> attachmentIds, String team);
+
+	/**
 	 * 获取所有的文件类型
 	 */
 	List<String> listAllMediaTypes();
+
+	/**
+	 * 获取所有分组
+	 */
+	List<String> listAllTeams();
 
 	IPage<AttachmentEntity> pageBy(AttachmentSearchParam param);
 
