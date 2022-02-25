@@ -188,7 +188,7 @@ public class BlogServiceImpl implements BlogService {
 				: blogEntity.getTitle();
 		if (isExist(url)) {
 			// 数据库长度 255
-			String newUrl = System.currentTimeMillis() + url;
+			String newUrl = System.currentTimeMillis() + "-" + url;
 			url = newUrl.substring(0, Math.min(newUrl.length(), 255));
 		}
 		blogEntity.setUrl(url);
@@ -284,6 +284,17 @@ public class BlogServiceImpl implements BlogService {
 				Wrappers.lambdaQuery(BlogEntity.class)
 						.select(BlogEntity::getUrl)
 						.eq(BlogEntity::getUrl, url)
+		);
+		return Objects.nonNull(entity);
+	}
+
+	@Override
+	public boolean isExist(int blogId, String url) {
+		BlogEntity entity = blogMapper.selectOne(
+				Wrappers.lambdaQuery(BlogEntity.class)
+						.select(BlogEntity::getUrl)
+						.eq(BlogEntity::getUrl, url)
+						.ne(BlogEntity::getId, blogId)
 		);
 		return Objects.nonNull(entity);
 	}

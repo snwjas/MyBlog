@@ -13,7 +13,10 @@ public class FlagIndex {
      * 标记结果
      */
     private boolean flag;
-
+    /**
+     * 是否黑名单词汇
+     */
+    private boolean isWhiteWord;
     /**
      * 标记索引
      */
@@ -35,4 +38,11 @@ public class FlagIndex {
         this.index = index;
     }
 
+    public boolean isWhiteWord() {
+        return isWhiteWord;
+    }
+
+    public void setWhiteWord(boolean whiteWord) {
+        isWhiteWord = whiteWord;
+    }
 }

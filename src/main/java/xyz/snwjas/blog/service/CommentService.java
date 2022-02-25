@@ -32,7 +32,7 @@ public interface CommentService {
 	/**
 	 * 获取子评论数量
 	 */
-	int getCountByParentId(int parentId);
+	int getCountByParentIdAndStatus(int parentId, CommentStatus status);
 
 	/**
 	 * 改变评论状态
@@ -84,6 +84,10 @@ public interface CommentService {
 	 */
 	IPage<CommentEntity> pageBy(int blogId, int parentId, BasePageParam param);
 
+	/**
+	 * 从顶层往下递归获取所有子评论
+	 */
+	IPage<CommentEntity> pageBy(int blogId, BasePageParam param);
 
 	CommentSimpleVO covertToSimpleVO(CommentEntity commentEntity);
 
@@ -92,6 +96,11 @@ public interface CommentService {
 	PageResult<CommentDetailVO> covertToDetailPageResult(IPage<CommentEntity> page);
 
 	PageResult<CommentSimpleVO> covertToSimplePageResult(IPage<CommentEntity> page);
+
+	/**
+	 * 从顶层往下递归获取所有子评论
+	 */
+	PageResult<CommentSimpleVO> covertToSimplePageResultByRecursively(IPage<CommentEntity> page);
 
 	List<CommentDetailVO> covertToListDetailVO(List<CommentEntity> commentEntityList);
 

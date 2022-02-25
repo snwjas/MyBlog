@@ -27,9 +27,11 @@ import xyz.snwjas.blog.utils.IPUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -62,15 +64,16 @@ public class CommentServiceImpl implements CommentService {
 		return commentMapper.selectCount(
 				Wrappers.lambdaQuery(CommentEntity.class)
 						.eq(CommentEntity::getBlogId, blogId)
-						.eq(CommentEntity::getStatus, status)
+						.eq(Objects.nonNull(status), CommentEntity::getStatus, status)
 		);
 	}
 
 	@Override
-	public int getCountByParentId(int parentId) {
+	public int getCountByParentIdAndStatus(int parentId, CommentStatus status) {
 		return commentMapper.selectCount(
 				Wrappers.lambdaQuery(CommentEntity.class)
 						.eq(CommentEntity::getParentId, parentId)
+						.eq(Objects.nonNull(status), CommentEntity::getStatus, status)
 		);
 	}
 
@@ -103,18 +106,47 @@ public class CommentServiceImpl implements CommentService {
 
 	@Override
 	public int deleteById(int commentId) {
-		return commentMapper.deleteById(commentId);
+		int i = commentMapper.deleteById(commentId);
+		int ri = 0;
+		if (i > 0) {
+			ri = deleteByRecursively(commentId);
+		}
+		return i + ri;
 	}
 
 	@Override
 	public int deleteByIds(@NonNull List<Integer> commentIds) {
-		Set<Integer> idSet = commentIds.stream()
+		Set<Integer> idSet = commentIds.stream().parallel()
 				.filter(id -> Objects.nonNull(id) && id > 0)
 				.collect(Collectors.toSet());
 		if (idSet.isEmpty()) {
 			return 0;
 		}
-		return commentMapper.deleteBatchIds(idSet);
+		AtomicInteger i = new AtomicInteger();
+		idSet.stream().parallel().forEach(id -> i.addAndGet(deleteById(id)));
+		return i.get();
+	}
+
+	/**
+	 * 递归删除评论
+	 */
+	private int deleteByRecursively(int parentId) {
+		List<CommentEntity> commentEntityList = commentMapper.selectList(
+				Wrappers.lambdaQuery(CommentEntity.class)
+						.select(CommentEntity::getId)
+						.eq(CommentEntity::getParentId, parentId)
+		);
+		if (CollectionUtils.isEmpty(commentEntityList)) {
+			return 0;
+		}
+		Set<Integer> commentIdSet = commentEntityList.stream().parallel()
+				.map(CommentEntity::getId)
+				.collect(Collectors.toSet());
+		int deleteCount = commentMapper.deleteBatchIds(commentIdSet);
+		// 递归继续
+		AtomicInteger deletes = new AtomicInteger();
+		commentIdSet.stream().parallel().forEach(id -> deletes.addAndGet(deleteByRecursively(id)));
+		return deleteCount + deletes.get();
 	}
 
 	@Override
@@ -164,6 +196,13 @@ public class CommentServiceImpl implements CommentService {
 
 			String ipAddress = IPUtils.getIpAddress(request);
 			commentEntity.setIpAddress(IPUtils.ipv4ToInt(ipAddress));
+
+			// 删除HTML标签，转换换行
+			String content = vo.getContent()
+					.replaceAll("<\\/?.+?\\/?>", "")
+					.replaceAll("\n", "<br>");
+			commentEntity.setContent(content);
+
 		} else {
 			commentEntity.setIsAdmin(true);
 			commentEntity.setStatus(CommentStatus.PUBLISHED);
@@ -186,11 +225,17 @@ public class CommentServiceImpl implements CommentService {
 	public IPage<CommentEntity> pageBy(int blogId, int parentId, BasePageParam param) {
 		Page<CommentEntity> page = new Page<>(param.getCurrent(), param.getPageSize());
 		Wrapper<CommentEntity> wrapper = Wrappers.lambdaQuery(CommentEntity.class)
+				.eq(CommentEntity::getBlogId, blogId)
 				// 顶层评论的父id为0
 				.eq(CommentEntity::getParentId, parentId)
-				.eq(CommentEntity::getBlogId, blogId)
+				.eq(CommentEntity::getStatus, CommentStatus.PUBLISHED)
 				.orderByDesc(CommentEntity::getId);
 		return commentMapper.selectPage(page, wrapper);
+	}
+
+	@Override
+	public IPage<CommentEntity> pageBy(int blogId, BasePageParam param) {
+		return pageBy(blogId, 0, param);
 	}
 
 	@Override
@@ -198,7 +243,7 @@ public class CommentServiceImpl implements CommentService {
 		CommentSimpleVO simpleVO = new CommentSimpleVO().convertFrom(commentEntity);
 
 		// 子评论数量
-		int count = getCountByParentId(simpleVO.getId());
+		int count = getCountByParentIdAndStatus(simpleVO.getId(), CommentStatus.PUBLISHED);
 		simpleVO.setChildrenCount(count);
 
 		return simpleVO;
@@ -214,7 +259,7 @@ public class CommentServiceImpl implements CommentService {
 			detailVO.setIpAddress(ipv4);
 		}
 		// 子评论数量
-		int count = getCountByParentId(detailVO.getId());
+		int count = getCountByParentIdAndStatus(detailVO.getId(), null);
 		detailVO.setChildrenCount(count);
 
 		// 获取博客标题和url
@@ -239,6 +284,16 @@ public class CommentServiceImpl implements CommentService {
 		List<CommentEntity> records = page.getRecords();
 		List<CommentSimpleVO> simpleVOList = covertToListSimpleVO(records);
 		return new PageResult<>(page.getTotal(), simpleVOList);
+	}
+
+
+	@Override
+	public PageResult<CommentSimpleVO> covertToSimplePageResultByRecursively(IPage<CommentEntity> page) {
+		List<CommentEntity> commentEntityList = page.getRecords();
+		List<CommentSimpleVO> commentVoList = commentEntityList.stream().parallel()
+				.map(e -> (CommentSimpleVO) new CommentSimpleVO().convertFrom(e))
+				.collect(Collectors.toList());
+		return new PageResult<>(page.getTotal(), listSimpleByRecursively(commentVoList));
 	}
 
 	@Override
@@ -281,5 +336,26 @@ public class CommentServiceImpl implements CommentService {
 				;
 	}
 
-
+	/**
+	 * 往下递归获取所有子评论
+	 */
+	private List<CommentSimpleVO> listSimpleByRecursively(List<CommentSimpleVO> voList) {
+		// 递归出口
+		if (CollectionUtils.isEmpty(voList)) {
+			return new ArrayList<>();
+		}
+		voList.stream().parallel().forEach(vo -> {
+			// 列出所有子评论
+			List<CommentEntity> childrenEntityList = commentMapper.selectList(
+					Wrappers.lambdaQuery(CommentEntity.class)
+							.eq(CommentEntity::getParentId, vo.getId())
+							.orderByDesc(CommentEntity::getId)
+			);
+			List<CommentSimpleVO> childrenVoList = childrenEntityList.stream().parallel()
+					.map(e -> (CommentSimpleVO) new CommentSimpleVO().convertFrom(e))
+					.collect(Collectors.toList());
+			vo.setChildren(listSimpleByRecursively(childrenVoList));
+		});
+		return voList;
+	}
 }

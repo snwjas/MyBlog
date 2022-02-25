@@ -31,6 +31,10 @@ public class CommentEntity extends BaseEntity {
 	@TableId(value = "id", type = IdType.AUTO)
 	private Integer id;
 
+	@ApiModelProperty(value = "父评论id")
+	@TableField("parent_id")
+	private Integer parentId;
+
 	@ApiModelProperty(value = "评论内容")
 	@TableField("content")
 	private String content;
@@ -43,9 +47,9 @@ public class CommentEntity extends BaseEntity {
 	@TableField("email")
 	private String email;
 
-	@ApiModelProperty(value = "父评论id")
-	@TableField("parent_id")
-	private Integer parentId;
+	@ApiModelProperty(value = "评论作者头像")
+	@TableField("avatar")
+	private String avatar;
 
 	@ApiModelProperty(value = "评论作者的ip地址")
 	@TableField("ip_address")

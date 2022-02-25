@@ -71,6 +71,9 @@ public class BlogController {
 	@PostMapping("/update")
 	@ApiOperation("更新博客文章信息")
 	public R updateBlog(@RequestBody @Validated(ValidGroupType.Update.class) BlogDetailVO vo) {
+		if (blogService.isExist(vo.getId(), vo.getUrl())) {
+			return RUtils.fail("博客路径已存在");
+		}
 		int i = blogService.update(vo);
 		return RUtils.commonFailOrNot(i, "博客信息文章更新");
 	}

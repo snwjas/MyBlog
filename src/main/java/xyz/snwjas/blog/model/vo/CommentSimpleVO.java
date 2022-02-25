@@ -12,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Comment VO
@@ -53,10 +54,16 @@ public class CommentSimpleVO implements BeanConvert, Serializable {
 	@ApiModelProperty("评论是否是博主发表的")
 	private Boolean isAdmin;
 
+	@ApiModelProperty(value = "评论作者头像")
+	private String avatar;
+
 	private LocalDateTime createTime;
 
 	@ApiModelProperty("子评论数量")
 	private Integer childrenCount;
+
+	@ApiModelProperty("子评论")
+	private List<CommentSimpleVO> children;
 
 	// 管理员校验
 	public interface Admin {

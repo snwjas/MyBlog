@@ -7,31 +7,30 @@ import java.util.Objects;
 
 /**
  * 敏感词过滤器
- * <p>
- * 开源项目地址: https://gitee.com/sharegpj/wordfilter
  *
  * @author minghu.zhang
+ * @gitee https://gitee.com/humingzhang/wordfilter
  */
 @SuppressWarnings("rawtypes")
 public class WordFilter {
+
+	private final WordContext context;
 
 	/**
 	 * 敏感词表
 	 */
 	private final Map wordMap;
 
-	private final WordContext wordContext;
-
 	/**
 	 * 构造函数
 	 */
 	public WordFilter(WordContext context) {
-		this.wordContext = context;
+		this.context = context;
 		this.wordMap = context.getWordMap();
 	}
 
-	public WordContext getWordContext() {
-		return wordContext;
+	public WordContext getContext() {
+		return context;
 	}
 
 	/**
@@ -65,8 +64,12 @@ public class WordFilter {
 		for (int i = 0; i < charset.length; i++) {
 			FlagIndex fi = getFlagIndex(charset, i, skip);
 			if (fi.isFlag()) {
-				for (int j : fi.getIndex()) {
-					charset[j] = symbol;
+				if (!fi.isWhiteWord()) {
+					for (int j : fi.getIndex()) {
+						charset[j] = symbol;
+					}
+				} else {
+					i += fi.getIndex().size() - 1;
 				}
 			}
 		}
@@ -89,15 +92,20 @@ public class WordFilter {
 	 * @param skip 文本距离
 	 */
 	public boolean include(final String text, final int skip) {
-		boolean flag = false;
+		boolean include = false;
 		char[] charset = text.toCharArray();
 		for (int i = 0; i < charset.length; i++) {
-			flag = getFlagIndex(charset, i, skip).isFlag();
-			if (flag) {
-				break;
+			FlagIndex fi = getFlagIndex(charset, i, skip);
+			if (fi.isFlag()) {
+				if (fi.isWhiteWord()) {
+					i += fi.getIndex().size() - 1;
+				} else {
+					include = true;
+					break;
+				}
 			}
 		}
-		return flag;
+		return include;
 	}
 
 	/**
@@ -121,7 +129,11 @@ public class WordFilter {
 		for (int i = 0; i < charset.length; i++) {
 			FlagIndex fi = getFlagIndex(charset, i, skip);
 			if (fi.isFlag()) {
-				count++;
+				if (fi.isWhiteWord()) {
+					i += fi.getIndex().size() - 1;
+				} else {
+					count++;
+				}
 			}
 		}
 		return count;
@@ -143,20 +155,24 @@ public class WordFilter {
 	 * @param skip 文本距离
 	 */
 	public List<String> wordList(final String text, final int skip) {
-		List<String> sensitives = new ArrayList<>();
+		List<String> wordList = new ArrayList<>();
 		char[] charset = text.toCharArray();
 		for (int i = 0; i < charset.length; i++) {
 			FlagIndex fi = getFlagIndex(charset, i, skip);
 			if (fi.isFlag()) {
-				StringBuilder builder = new StringBuilder();
-				for (int j : fi.getIndex()) {
-					char word = text.charAt(j);
-					builder.append(word);
+				if (fi.isWhiteWord()) {
+					i += fi.getIndex().size() - 1;
+				} else {
+					StringBuilder builder = new StringBuilder();
+					for (int j : fi.getIndex()) {
+						char word = text.charAt(j);
+						builder.append(word);
+					}
+					wordList.add(builder.toString());
 				}
-				sensitives.add(builder.toString());
 			}
 		}
-		return sensitives;
+		return wordList;
 	}
 
 	/**
@@ -193,7 +209,7 @@ public class WordFilter {
 				flag = true;
 			}
 			if ("1".equals(current.get("isWhiteWord"))) {
-				flag = false;
+				fi.setWhiteWord(true);
 				break;
 			}
 		}
