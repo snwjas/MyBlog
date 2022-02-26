@@ -13,7 +13,7 @@ MyBlog主要是基于 SpringBoot + Vue 前后端分离开发的一款动态个�
 
 `鸣谢`：本项目在诸多方面，特别是UI设计方面，借鉴学习了[Halo](https://halo.run/)。
 
-如果本项目对你有帮助，不妨点个==Star==，你的支持就是对我行动的最大鼓励！
+如果本项目对你有帮助，不妨点个***Star***，你的支持就是对我行动的最大鼓励！
 
 
 
@@ -71,16 +71,16 @@ MyBlog主要是基于 SpringBoot + Vue 前后端分离开发的一款动态个�
 | ---------------------------------- | -------------------------- | ------------------------------ |
 | doc-enable                         | false                      | swagger api文档是否启用        |
 | admin-path                         | “admin”                    | 后台管理入口，不需要添加'/'    |
+| admin-web-path                     | “classpath:/admin/”        | 管理端WEB静态文件所在目录      |
+| app-web-path                       | “classpath:/app/”          | 展示前端WEB静态文件所在目录    |
 | allow-login-failure-seconds        | 3600                       | 允许连续登录失败的时间(单位秒) |
 | allow-login-failure-count          | 10                         | 允许连续登录失败的次数         |
 | remember-me-token-validity-seconds | 604800                     | 登录记住我token时间(单位秒)    |
 | file-save-path                     | “[user.home]/MyBlog/files” | 上传文件保存路径               |
 
-另外，在`MainController`配置了前后和后台的入口所映射的静态资源，分别对应`resources/app/index.html`和`resources/admin/index.html`。
+请将打包后的管理端 / 展示前端文件分别放置以上属性`admin-web-path` / `app-web-path`目录
 
-
-
-## 项目结构
+## 项目结构 
 
 ```java
 .|--src.main.java
@@ -193,20 +193,21 @@ MyBlog主要是基于 SpringBoot + Vue 前后端分离开发的一款动态个�
 
 **comment : 博客评论表**
 
-|    字段     |        类型         |   约束   |           说明           |
-| :---------: | :-----------------: | :------: | :----------------------: |
-|     id      |  int(11) unsigned   |   主键   |          评论id          |
-|   content   |    varchar(1023)    | not null |         评论内容         |
-|   author    |     varchar(64)     | not null |         评论作者         |
-|    email    |    varchar(127)     | not null |       评论作者邮箱       |
-|  parent_id  |  int(11) unsigned   |          |   父评论id，0顶层评论    |
-| ip_address  |       int(11)       |          | 评论作者的IPv4地址，整型 |
-| user_agent  |    varchar(511)     |          |    评论作者的用户代理    |
-|   blog_id   |  int(11) unsigned   | not null |          博客id          |
-|   status    | tinyint(4) unsigned |          |         评论状态         |
-|  is_admin   | tinyint(4) unsigned |          | 0: 访客(默认); 1: 管理员 |
-| update_time |      timestamp      |          |         更新时间         |
-| create_time |      timestamp      |          |         创建时间         |
+|    字段     |        类型         |   约束   |            说明            |
+| :---------: | :-----------------: | :------: | :------------------------: |
+|     id      |  int(11) unsigned   |   主键   |           评论id           |
+|  parent_id  |  int(11) unsigned   |          | 父评论id，0顶层评论，默认0 |
+|   content   |    varchar(1023)    | not null |          评论内容          |
+|   author    |     varchar(64)     | not null |          评论作者          |
+|    email    |    varchar(127)     | not null |        评论作者邮箱        |
+|   avatar    |    varchar(1023)    |          |        评论作者头像        |
+| ip_address  |       int(11)       |          |  评论作者的IPv4地址，整型  |
+| user_agent  |    varchar(511)     |          |     评论作者的用户代理     |
+|   blog_id   |  int(11) unsigned   | not null |           博客id           |
+|   status    | tinyint(4) unsigned |          |          评论状态          |
+|  is_admin   | tinyint(4) unsigned |          |  0: 访客(默认); 1: 管理员  |
+| update_time |      timestamp      |          |          更新时间          |
+| create_time |      timestamp      |          |          创建时间          |
 
 **attachment  : 附件表**
 
@@ -248,14 +249,14 @@ MyBlog主要是基于 SpringBoot + Vue 前后端分离开发的一款动态个�
 
 **log : 日志表**
 
-|    字段     |        类型         |   约束   |          说明          |
-| :---------: | :-----------------: | :------: | :--------------------: |
-|     id      |  int(11) unsigned   |   主键   |         日志id         |
-|   content   |    varchar(1023)    | not null |        操作内容        |
-|    type     | tinyint(4) unsigned | not null |        操作类型        |
-| ip_address  |       int(11)       |          | 操作人的ipv4地址，整型 |
-| update_time |      timestamp      |          |        更新时间        |
-| create_time |      timestamp      |          |        创建时间        |
+|    字段     |        类型         | 约束 |          说明          |
+| :---------: | :-----------------: | :--: | :--------------------: |
+|     id      |  int(11) unsigned   | 主键 |         日志id         |
+|   content   |    varchar(1023)    |      |        操作内容        |
+|    type     | tinyint(4) unsigned |      |        操作类型        |
+| ip_address  |       int(11)       |      | 操作人的ipv4地址，整型 |
+| update_time |      timestamp      |      |        更新时间        |
+| create_time |      timestamp      |      |        创建时间        |
 
 **statistics : 统计表（统计每日的数据）**
 

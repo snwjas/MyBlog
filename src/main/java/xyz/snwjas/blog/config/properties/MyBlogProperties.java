@@ -26,6 +26,16 @@ public class MyBlogProperties {
 	private String adminPath = "admin";
 
 	/**
+	 * 自定义管理端WEB静态文件所在目录，默认为“classpath:/admin/”
+	 */
+	private String adminWebPath = null;
+
+	/**
+	 * 自定义展示前端WEB静态文件所在目录，默认为“classpath:/app/”
+	 */
+	private String appWebPath = null;
+
+	/**
 	 * 允许连续登录失败的时间（单位秒）
 	 */
 	private int allowLoginFailureSeconds = 3600;

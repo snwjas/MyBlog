@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextListener;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -19,10 +20,10 @@ import xyz.snwjas.blog.config.properties.MyBlogProperties;
 import xyz.snwjas.blog.constant.RS;
 import xyz.snwjas.blog.interceptor.AccessLimitInterceptor;
 import xyz.snwjas.blog.interceptor.StatisticInterceptor;
+import xyz.snwjas.blog.utils.FileUtils;
 import xyz.snwjas.blog.utils.RUtils;
 import xyz.snwjas.blog.utils.RWriterUtils;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -94,19 +95,21 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
 
 		// 后台资源映射
 		String adminPath = "/" + properties.getAdminPath() + "/**";
+		String adminWebPath = StringUtils.hasText(properties.getAdminWebPath())
+				? FileUtils.getFileResLoc(properties.getAdminWebPath())
+				: "classpath:/admin/";
 		registry.addResourceHandler(adminPath)
-				.addResourceLocations("classpath:/admin/");
+				.addResourceLocations(adminWebPath);
 		// 前台资源映射
+		String appWebPath = StringUtils.hasText(properties.getAppWebPath())
+				? FileUtils.getFileResLoc(properties.getAppWebPath())
+				: "classpath:/app/";
 		registry.addResourceHandler("/app/**")
-				.addResourceLocations("classpath:/app/");
+				.addResourceLocations(appWebPath);
 
 		// 上传文件的静态资源映射
-		String filesSavePath = properties.getFileSavePath();
-		if (!filesSavePath.endsWith(File.separator)) {
-			filesSavePath += File.separator;
-		}
 		registry.addResourceHandler("/static/**"/*, "/favicon.ico"*/)
-				.addResourceLocations("classpath:/static/", "file:" + filesSavePath);
+				.addResourceLocations("classpath:/static/", FileUtils.getFileResLoc(properties.getFileSavePath()));
 
 		// super.addResourceHandlers(registry);
 	}

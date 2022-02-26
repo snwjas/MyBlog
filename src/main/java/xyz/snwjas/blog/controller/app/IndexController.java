@@ -39,7 +39,7 @@ public class IndexController {
 	@Autowired
 	private UserService userService;
 
-	@AccessLimit(maxCount = 2)
+	@AccessLimit(maxCount = 1)
 	@GetMapping("/attributes")
 	@ApiOperation("获取博客的基本属性")
 	public R getAttributes() {

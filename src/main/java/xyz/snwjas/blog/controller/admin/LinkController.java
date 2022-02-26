@@ -2,10 +2,10 @@ package xyz.snwjas.blog.controller.admin;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.sun.istack.internal.NotNull;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.snwjas.blog.constant.OtherOptionEnum;
@@ -71,11 +71,13 @@ public class LinkController {
 
 	@PostMapping("/update/parser")
 	@ApiOperation("更新网站Logo（favicon）解析API")
-	public R updateUrlLogoParser(@RequestParam("parser") @NotNull String logoParser) {
+	public R updateUrlLogoParser(@RequestParam("parser") @NonNull String logoParser) {
 		int i = optionsService.setAnyway(OtherOptionEnum.URL_FAVICON_PARSER.key(), logoParser);
 		if (i > 0) {
-			optionsService.resetOptionsCache();
-			linkService.updateLogoParser(logoParser);
+			int j = linkService.updateLogoParser(logoParser);
+			if (j > 0) {
+				optionsService.resetOptionsCache();
+			}
 		}
 		return RUtils.commonFailOrNot(i, "友链Logo解析API修改");
 	}

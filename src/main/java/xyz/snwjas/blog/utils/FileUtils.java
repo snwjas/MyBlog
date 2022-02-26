@@ -80,4 +80,19 @@ public class FileUtils {
 		}
 		return new int[]{0, 0};
 	}
+
+	/**
+	 * 获取SpringWebMVC文件资源映射路径
+	 *
+	 * @param path 映射目录
+	 */
+	public static String getFileResLoc(String path) {
+		if (StringUtils.isBlank(path)) {
+			throw new IllegalArgumentException("参数不能为空");
+		}
+		if (!path.endsWith(File.separator)) {
+			path += File.separator;
+		}
+		return "file:" + path;
+	}
 }
