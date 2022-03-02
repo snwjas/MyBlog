@@ -14,7 +14,7 @@ public class FlagIndex {
      */
     private boolean flag;
     /**
-     * 是否黑名单词汇
+     * 是否白名单词汇
      */
     private boolean isWhiteWord;
     /**

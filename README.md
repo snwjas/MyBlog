@@ -270,5 +270,12 @@ MyBlog主要是基于 SpringBoot + Vue 前后端分离开发的一款动态个�
 |   update_time    |    timestamp     |          |  更新时间  |
 |   create_time    |    timestamp     |          |  创建时间  |
 
+**speciallist : 特殊清单**
 
-
+|    字段     |        类型         | 约束 |   说明   |
+| :---------: | :-----------------: | :--: | :------: |
+|     id      |  int(11) unsigned   | 主键 |    ID    |
+|    type     | tinyint(4) unsigned |      |   类型   |
+|   content   |    varchar(511)     |      |   内容   |
+| update_time |      timestamp      |      | 更新时间 |
+| create_time |      timestamp      |      | 创建时间 |

@@ -32,14 +32,7 @@ public class MyBlogConfig {
 	 */
 	@Bean
 	public WordFilter wordFilter() {
-		// 默认
-		String blacklist = "/wordfilter/blacklist.txt";
-		String whitelist = "/wordfilter/whitelist.txt";
-		log.info("加载敏感词过滤器...");
-		WordContext wordContext = new WordContext(blacklist, whitelist);
-		WordFilter wordFilter = new WordFilter(wordContext);
-		log.info("敏感词过滤器加载完毕。");
-		return wordFilter;
+		return new WordFilter(new WordContext());
 	}
 
 	/**
@@ -56,5 +49,5 @@ public class MyBlogConfig {
 		executor.setAwaitTerminationSeconds(3);
 		return executor;
 	}
-	
+
 }

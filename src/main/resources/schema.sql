@@ -238,6 +238,26 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='用户';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+
+--
+-- Table structure for table `speciallist`
+--
+
+DROP TABLE IF EXISTS `speciallist`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `speciallist` (
+                               `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+                               `type` tinyint(4) unsigned NOT NULL COMMENT '类型',
+                               `content` varchar(511) DEFAULT '' COMMENT '内容',
+                               `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                               `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                               PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='特殊清单表';
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+
 --
 -- Dumping routines for database 'myblogdb'
 --

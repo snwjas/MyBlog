@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import xyz.snwjas.blog.mapper.LogMapper;
 import xyz.snwjas.blog.model.PageResult;
 import xyz.snwjas.blog.model.entity.LogEntity;
@@ -35,7 +36,7 @@ public class LogServiceImpl implements LogService {
 	public IPage<LogEntity> pageBy(LogSearchParam param) {
 		Page<LogEntity> page = new Page<>(param.getCurrent(), param.getPageSize());
 		Wrapper<LogEntity> wrapper = Wrappers.lambdaQuery(LogEntity.class)
-				.in(Objects.nonNull(param.getTypes()), LogEntity::getType, param.getTypes())
+				.in(!CollectionUtils.isEmpty(param.getTypes()), LogEntity::getType, param.getTypes())
 				.orderByDesc(LogEntity::getId);
 		return logMapper.selectPage(page, wrapper);
 	}

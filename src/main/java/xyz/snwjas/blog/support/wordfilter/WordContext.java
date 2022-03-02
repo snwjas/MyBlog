@@ -24,6 +24,8 @@ public class WordContext {
 	 */
 	private boolean init;
 
+	public WordContext() {}
+
 	/**
 	 * @param blackList 黑名单文件路径
 	 * @param whiteList 白名单文件路径
@@ -177,6 +179,39 @@ public class WordContext {
 						wordMap.remove(lastChar);
 					}
 				}
+			}
+		}
+	}
+
+	/**
+	 * 在线删除敏感词
+	 *
+	 * @param wordType 黑名单 BLACk，白名单WHITE
+	 */
+	public void removeWord(WordType wordType) {
+		if (Objects.isNull(wordType)) {
+			this.wordMap.clear();
+		}
+		Map nowMap = this.wordMap;
+		Iterator iterator = nowMap.keySet().iterator();
+		while (iterator.hasNext()) {
+			Object key = iterator.next();
+			Map map = (Map) nowMap.get(key);
+			while (Objects.nonNull(map) &&
+					String.valueOf(EndType.HAS_NEXT.ordinal()).equals(map.get("isEnd"))) {
+				String word = "";
+				for (Object k : map.keySet()) {
+					String s = String.valueOf(k);
+					if (!"isEnd".equals(s)) {
+						word = s;
+						break;
+					}
+				}
+				map = (Map) map.get(word.charAt(0));
+			}
+			if (Objects.nonNull(map)
+					&& String.valueOf(wordType.ordinal()).equals(map.get("isWhiteWord"))) {
+				iterator.remove();
 			}
 		}
 	}
