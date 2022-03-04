@@ -24,7 +24,9 @@ public class WordContext {
 	 */
 	private boolean init;
 
-	public WordContext() {}
+	public WordContext() {
+		this.init = true;
+	}
 
 	/**
 	 * @param blackList 黑名单文件路径
@@ -193,27 +195,43 @@ public class WordContext {
 			this.wordMap.clear();
 		}
 		Map nowMap = this.wordMap;
-		Iterator iterator = nowMap.keySet().iterator();
-		while (iterator.hasNext()) {
-			Object key = iterator.next();
-			Map map = (Map) nowMap.get(key);
-			while (Objects.nonNull(map) &&
-					String.valueOf(EndType.HAS_NEXT.ordinal()).equals(map.get("isEnd"))) {
-				String word = "";
-				for (Object k : map.keySet()) {
-					String s = String.valueOf(k);
-					if (!"isEnd".equals(s)) {
-						word = s;
-						break;
-					}
-				}
-				map = (Map) map.get(word.charAt(0));
-			}
-			if (Objects.nonNull(map)
-					&& String.valueOf(wordType.ordinal()).equals(map.get("isWhiteWord"))) {
-				iterator.remove();
+		for (Object okey : new HashSet<>(nowMap.keySet())) {
+			Map map = (Map) nowMap.get(okey);
+			boolean b = removeWordRec(map, getMapKeys(map), wordType);
+			if (b) {
+				nowMap.remove(okey);
 			}
 		}
+	}
+
+	private boolean removeWordRec(Map subWordMap, List<Character> keyList, WordType wordType) {
+		if (Objects.isNull(subWordMap) ||
+				String.valueOf(EndType.IS_END.ordinal()).equals(subWordMap.get("isEnd"))) {
+			return String.valueOf(wordType.ordinal()).equals(subWordMap.get("isWhiteWord"));
+		}
+		boolean res = false;
+		int left = keyList.size();
+		for (Character key : keyList) {
+			Map map = (Map) subWordMap.get(key);
+			boolean b = removeWordRec(map, getMapKeys(map), wordType);
+			if (b && left > 1) {
+				subWordMap.remove(key);
+				left--;
+			} else if (b) {
+				res = true;
+			}
+		}
+		return res;
+	}
+
+	private List<Character> getMapKeys(Map map) {
+		List<Character> keyList = new LinkedList<>();
+		for (Object k : map.keySet()) {
+			if (k instanceof Character) {
+				keyList.add((Character) k);
+			}
+		}
+		return keyList;
 	}
 
 	/**
