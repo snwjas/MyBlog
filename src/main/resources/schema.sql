@@ -239,6 +239,8 @@ CREATE TABLE `user` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 
+INSERT INTO `user` (`username`, `password`, `nickname`, `email`, `avatar`, `description`) VALUES ('admin', '$2y$05$1bJ0VWvrCAvwdOHgEk6pneNmptl4MGkpUjACmg0nKOV608L9VFjea', 'MylesYYY', 'myles.yang@foxmail.com', '', 'https://refrain.xyz/');
+
 --
 -- Table structure for table `speciallist`
 --

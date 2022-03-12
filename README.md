@@ -59,7 +59,9 @@ MyBlog主要是基于 SpringBoot + Vue 前后端分离开发的一款动态个�
 
 ## 快速开始
 
-环境准备完毕后，修改配置文件`application-dev.yaml`中的`datasource`配置即可以开发环境运行：
+1、新建数据库`myblogdb`，选择编码为utf8mb4；然后导入项目源码下resources目录的表结构`schema.sql`。
+
+2、环境准备完毕后，修改配置文件`application-dev.yaml`中的`datasource`配置即可以开发环境运行：
 
 - 默认后台地址：http://localhost:9096/admin
 
