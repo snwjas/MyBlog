@@ -5,7 +5,6 @@ import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import xyz.snwjas.blog.annotation.TimeCost;
 import xyz.snwjas.blog.mapper.BlogTagMapper;
 import xyz.snwjas.blog.mapper.TagMapper;
 import xyz.snwjas.blog.model.entity.BlogTagEntity;
@@ -14,7 +13,10 @@ import xyz.snwjas.blog.model.vo.TagVO;
 import xyz.snwjas.blog.service.TagService;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -159,7 +161,6 @@ public class TagServiceImpl implements TagService {
 		return i;
 	}
 
-	@TimeCost
 	@Override
 	public int updateBlogUsed(int blogId, @NonNull List<TagVO> tagVOList) {
 		if (tagVOList.isEmpty()) {

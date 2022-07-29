@@ -209,13 +209,6 @@ public class BlogServiceImpl implements BlogService {
 		return blogId;
 	}
 
-	/**
-	 * 添加或更新博客信息时，对信息的检验修正
-	 */
-	private BlogDetailVO checkBlogData(BlogDetailVO vo) {
-		return null;
-	}
-
 	@Override
 	public int like(int blogId) {
 		BlogEntity blog = blogMapper.selectOne(

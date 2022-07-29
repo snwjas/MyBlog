@@ -7,9 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.snwjas.blog.annotation.AccessLimit;
-import xyz.snwjas.blog.annotation.TimeCost;
 import xyz.snwjas.blog.constant.CacheKeyPrefix;
 import xyz.snwjas.blog.constant.RS;
+import xyz.snwjas.blog.model.PageResult;
+import xyz.snwjas.blog.model.R;
 import xyz.snwjas.blog.model.entity.BlogEntity;
 import xyz.snwjas.blog.model.enums.BlogStatus;
 import xyz.snwjas.blog.model.params.BlogSearchParam;
@@ -17,8 +18,6 @@ import xyz.snwjas.blog.model.vo.BlogArchiveVO;
 import xyz.snwjas.blog.model.vo.BlogDetailVO;
 import xyz.snwjas.blog.model.vo.BlogSimpleVO;
 import xyz.snwjas.blog.service.BlogService;
-import xyz.snwjas.blog.model.PageResult;
-import xyz.snwjas.blog.model.R;
 import xyz.snwjas.blog.support.cache.MemoryCacheStore;
 import xyz.snwjas.blog.utils.IPUtils;
 import xyz.snwjas.blog.utils.RUtils;
@@ -73,7 +72,6 @@ public class BlogController {
 		return RUtils.success("文章归档", map);
 	}
 
-	@TimeCost
 	@AccessLimit(maxCount = 2)
 	@GetMapping("/content/{blogUrl}")
 	@ApiOperation("获取博客文章内容")
@@ -97,7 +95,7 @@ public class BlogController {
 		return RUtils.success("博客文章内容", blogContent);
 	}
 
-	@AccessLimit(maxCount = 1)
+	@AccessLimit(maxCount = 3)
 	@GetMapping("/like/{blogId}")
 	@ApiOperation("点赞博客")
 	public R like(@PathVariable("blogId") @Min(1) Integer blogId) {

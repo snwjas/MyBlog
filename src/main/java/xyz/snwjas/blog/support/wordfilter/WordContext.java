@@ -193,6 +193,7 @@ public class WordContext {
 	public void removeWord(WordType wordType) {
 		if (Objects.isNull(wordType)) {
 			this.wordMap.clear();
+			return;
 		}
 		Map nowMap = this.wordMap;
 		for (Object okey : new HashSet<>(nowMap.keySet())) {
@@ -205,8 +206,7 @@ public class WordContext {
 	}
 
 	private boolean removeWordRec(Map subWordMap, List<Character> keyList, WordType wordType) {
-		if (Objects.isNull(subWordMap) ||
-				String.valueOf(EndType.IS_END.ordinal()).equals(subWordMap.get("isEnd"))) {
+		if (String.valueOf(EndType.IS_END.ordinal()).equals(subWordMap.get("isEnd"))) {
 			return String.valueOf(wordType.ordinal()).equals(subWordMap.get("isWhiteWord"));
 		}
 		boolean res = false;
